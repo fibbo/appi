@@ -7,7 +7,7 @@ Welcome to APPI's documentation!
 ================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
    best_practices
@@ -23,5 +23,3 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-
-test
