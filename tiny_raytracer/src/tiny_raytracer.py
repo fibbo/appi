@@ -1,17 +1,17 @@
 import math
 import sys
-from vector import vector
+from vector import Vector
 
 float_max = sys.float_info.max
 
 
-class light:
+class Light:
     def __init__(self, position, intensity):
         self.position = position
         self.intensity = intensity
 
 
-class material:
+class Material:
     def __init__(self, refrac_index, albedo, diffuse_color, specular_exponent):
         self.refractive_index = refrac_index
         self.albedo = albedo
@@ -19,7 +19,7 @@ class material:
         self.specular_exponent = specular_exponent
 
 
-class sphere:
+class Sphere:
     def __init__(self, center, radius, material):
         self.center = center
         self.radius = radius
@@ -54,7 +54,7 @@ def refract(incoming, normal, eta_t, eta_i=1.0):
     eta = eta_i / eta_t
     k = 1 - eta * eta * (1 - cosi * cosi)
     if k < 0:
-        return vector(1, 0, 0)
+        return Vector(1, 0, 0)
     else:
         return incoming * eta + normal * (eta * cosi - math.sqrt(k))
 
@@ -78,10 +78,10 @@ def scene_intersect(origin, direction, spheres):
 def cast_ray(origin, direction, spheres, lights, depth=0):
 
     if depth > 4:
-        return vector(0.2, 0.7, 0.8)
+        return Vector(0.2, 0.7, 0.8)
     has_hit, point, normal, material = scene_intersect(origin, direction, spheres)
     if not has_hit:
-        return vector(0.2, 0.7, 0.8)
+        return Vector(0.2, 0.7, 0.8)
 
     reflect_dir = reflect(direction, normal).normalize()
     refract_dir = refract(direction, normal, material.refractive_index).normalize()
@@ -107,7 +107,7 @@ def cast_ray(origin, direction, spheres, lights, depth=0):
         )
     return (
         material.diffuse_color * diffuse_light_intensity * material.albedo[0]
-        + vector(1.0, 1.0, 1.0) * specular_light_intensity * material.albedo[1]
+        + Vector(1.0, 1.0, 1.0) * specular_light_intensity * material.albedo[1]
         + reflect_color * material.albedo[2]
         + refract_color * material.albedo[3]
     )
@@ -124,8 +124,8 @@ def render(spheres, lights):
             dir_y = -(j + 0.5) + height / 2.0
             dir_z = -height / (2.0 * math.tan(fov / 2.0))
             framebuffer[i + j * width] = cast_ray(
-                vector(0, 0, 0),
-                vector(dir_x, dir_y, dir_z).normalize(),
+                Vector(0, 0, 0),
+                Vector(dir_x, dir_y, dir_z).normalize(),
                 spheres,
                 lights,
             )
@@ -143,17 +143,17 @@ def render(spheres, lights):
 
 
 def main():
-    ivory = material(1.0, vector(0.6, 0.3, 0.1, 0.0), vector(0.4, 0.4, 0.3), 50)
-    glass = material(1.5, vector(0.0, 0.5, 0.1, 0.8), vector(0.6, 0.7, 0.8), 125)
-    red_rubber = material(1.0, vector(0.9, 0.1, 0.0, 0.0), vector(0.3, 0.1, 0.1), 10)
-    mirror = material(1.0, vector(0.0, 10.0, 0.8, 0.0), vector(1.0, 1.0, 1.0), 1425)
+    ivory = Material(1.0, Vector(0.6, 0.3, 0.1, 0.0), Vector(0.4, 0.4, 0.3), 50)
+    glass = Material(1.5, Vector(0.0, 0.5, 0.1, 0.8), Vector(0.6, 0.7, 0.8), 125)
+    red_rubber = Material(1.0, Vector(0.9, 0.1, 0.0, 0.0), Vector(0.3, 0.1, 0.1), 10)
+    mirror = Material(1.0, Vector(0.0, 10.0, 0.8, 0.0), Vector(1.0, 1.0, 1.0), 1425)
 
     spheres = [
-        sphere(vector(-3, 0, -16), 2, ivory),
-        sphere(vector(-1.0, -1.5, -12), 2, glass),
-        sphere(vector(1.5, -0.5, -18), 3, red_rubber),
-        sphere(
-            vector(
+        Sphere(Vector(-3, 0, -16), 2, ivory),
+        Sphere(Vector(-1.0, -1.5, -12), 2, glass),
+        Sphere(Vector(1.5, -0.5, -18), 3, red_rubber),
+        Sphere(
+            Vector(
                 7,
                 5,
                 -18,
@@ -164,48 +164,12 @@ def main():
     ]
 
     lights = [
-        light(vector(-20, 20, 20), 1.5),
-        light(vector(30, 50, -25), 1.8),
-        light(vector(30, 20, 30), 1.7),
+        Light(Vector(-20, 20, 20), 1.5),
+        Light(Vector(30, 50, -25), 1.8),
+        Light(Vector(30, 20, 30), 1.7),
     ]
 
     render(spheres, lights)
 
 
 main()
-
-
-def tests():
-    a = vector(1, 0, 0)
-    b = vector(2, 1, 1)
-    c = vector(3, 4, 5)
-
-    assert a == vector(1, 0, 0)
-
-    res1 = 2 * b
-    res2 = b * 2
-
-    assert res1 == vector(4, 2, 2)
-    assert res1 == res2
-
-    assert -b == vector(-2, -1, -1)
-    assert b == vector(2, 1, 1)
-
-    n = a.normalize()
-
-    assert n.norm() == 1.0
-
-    assert a.dot(c) == c.dot(a)
-
-    assert b.cross(c) == vector(1, -7, 5)
-    assert c.cross(b) == -b.cross(c)
-
-    assert a + b == vector(3, 1, 1)
-
-    d = vector(1, 2, 3, 4)
-    e = d * 2
-    assert e == vector(2, 4, 6, 8)
-    assert e / 2 == d
-
-
-tests()

@@ -1,6 +1,9 @@
-class vector:
+import math
+
+
+class Vector:
     def __init__(self, *args):
-        self.components = 'B'[]
+        self.components = []
         for i in args:
             self.components.append(i)
         self.size = len(self.components)
@@ -10,7 +13,7 @@ class vector:
 
     def cross(self, rhs):
         assert self.size == 3 and rhs.size == 3
-        return vector(
+        return Vector(
             self[1] * rhs[2] - self[2] * rhs[1],
             self[2] * rhs[0] - self[0] * rhs[2],
             self[0] * rhs[1] - self[1] * rhs[0],
@@ -27,7 +30,7 @@ class vector:
         new_vec = []
         for i in range(self.size):
             new_vec.append(self.components[i] * scalar)
-        return vector(*new_vec)
+        return Vector(*new_vec)
 
     def __rmul__(self, scalar):
         return self * scalar
@@ -37,20 +40,20 @@ class vector:
         assert self.size == other.size
         for i in range(self.size):
             new_vec.append(self.components[i] - other.components[i])
-        return vector(*new_vec)
+        return Vector(*new_vec)
 
     def __truediv__(self, scalar):
         new_vec = []
         for i in range(self.size):
             new_vec.append(self.components[i] / scalar)
-        return vector(*new_vec)
+        return Vector(*new_vec)
 
     def __add__(self, other):
         new_vec = []
         assert self.size == other.size
         for i in range(self.size):
             new_vec.append(self.components[i] + other.components[i])
-        return vector(*new_vec)
+        return Vector(*new_vec)
 
     def dot(self, other):
         scalar_product = 0
@@ -73,4 +76,3 @@ class vector:
     def normalize(self, length=1):
         assert self.size == 3
         return self / (length * self.norm())
-
