@@ -2,6 +2,18 @@
 
 This is my try at contributing to APPI
 
+# Capstone Project
+
+The idea of the capstone project is based on tinyraytracer, a 250 line C++ ray-tracer - rewritten in Python.
+
+It uses a scene description of materials, spheres and lights and uses this scene to render an image based on the law of physics (diffuse light, ambient light, reflection, refraction).
+
+The key class is the `Vector` class. Even though there is no heritance involved it shows many of the overload methods like `__add__`, `__sub__`.
+
+Inheritance can be shown in a smaller side example.
+
+The web part will be achieved by providing a screen description as text file online. The students will need to get the description and parse it to create the scene objects.
+
 ## chapters
 
 Contains a folder for each chapter for this course. Each subfolder contains at least a `README.md`. Other files might be example source code related to the chapter.
