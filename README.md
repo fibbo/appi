@@ -4,7 +4,7 @@ This is my try at contributing to APPI
 
 # Capstone Project
 
-The idea of the capstone project is based on tinyraytracer, a 250 line C++ ray-tracer - rewritten in Python.
+The idea of the capstone project is based on tinyraytracer, a 256 line C++ ray-tracer - rewritten in Python [tinyraytracer](https://github.com/ssloy/tinyraytracer).
 
 It uses a scene description of materials, spheres and lights and uses this scene to render an image based on the law of physics (diffuse light, ambient light, reflection, refraction).
 

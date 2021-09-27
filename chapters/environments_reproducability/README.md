@@ -21,10 +21,10 @@ and you have following Python program:
 ```python
 import foo
 
-foo.do_something()
+foo.do_something() # function takes 0 parameters
 ```
 
-Now imagine the maintainer of `foo` decides to change the function signature and it now accepts `0` parameters.
+Now imagine the maintainer of `foo` decides to change the function signature and it now accepts `1` parameters.
 
 If someone at a later point also installs the `foo` library he will get the newer version of this library and if this person then tries to run the code above following will happen:
 
