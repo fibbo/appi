@@ -73,7 +73,28 @@ def scene_intersect(origin, direction, spheres):
             normal = (hit - sphere.center).normalize()
             material = sphere.material
 
-    return (spheres_dist < 1000, hit, normal, material)
+    checkerboard_dist = float_max
+    if abs(direction.y) > 1e-3:
+        d = -(origin.y + 4) / direction.y
+        pt = origin + direction * d
+        if (
+            d > 1e-3
+            and abs(pt.x) < 10
+            and pt.z < -10
+            and pt.z > -30
+            and d < spheres_dist
+        ):
+            checkerboard_dist = d
+            hit = pt
+            normal = Vector(0, 1, 0)
+            diffuse_color = (
+                Vector(0.3, 0.3, 0.3)
+                if (int(0.5 * hit.x + 1000) + int(0.5 * hit.z)) & 1
+                else Vector(0.3, 0.2, 0.1)
+            )
+            material = Material(1, Vector(1, 0, 0, 0), diffuse_color, 0)
+
+    return (min(spheres_dist, checkerboard_dist) < 1000, hit, normal, material)
 
 
 def cast_ray(origin, direction, spheres, lights, depth=0):
