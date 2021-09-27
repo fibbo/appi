@@ -1,6 +1,7 @@
 import math
 import sys
 from vector import Vector
+import requests as req
 
 float_max = sys.float_info.max
 
@@ -113,7 +114,7 @@ def cast_ray(origin, direction, spheres, lights, depth=0):
     )
 
 
-def render(spheres, lights):
+def render(scene):
     width = 400
     height = 200
     fov = math.pi / 3.0
@@ -126,8 +127,8 @@ def render(spheres, lights):
             framebuffer[i + j * width] = cast_ray(
                 Vector(0, 0, 0),
                 Vector(dir_x, dir_y, dir_z).normalize(),
-                spheres,
-                lights,
+                scene["spheres"],
+                scene["lights"],
             )
 
     with open("out.ppm", "wb") as f:
@@ -142,34 +143,49 @@ def render(spheres, lights):
             f.write(vec)
 
 
+def read_scene(url):
+    scene = {}
+    scene["lights"] = []
+    scene["spheres"] = []
+    materials = {}
+
+    answer = req.get(url)
+
+    scene_object_type = None
+    for line in answer.text.split("\n"):
+        parts = line.split()
+        if line == "":
+            continue
+        if line.startswith("#"):
+            scene_object_type = parts[1]
+        else:
+            if scene_object_type == "materials":
+                name = parts[0]
+                refractive = float(parts[1])
+                albedo = Vector(
+                    float(parts[2]), float(parts[3]), float(parts[4]), float(parts[5])
+                )
+                color = Vector(float(parts[6]), float(parts[7]), float(parts[8]))
+                specular = float(parts[9])
+                materials[name] = Material(refractive, albedo, color, specular)
+            elif scene_object_type == "spheres":
+                center = Vector(float(parts[0]), float(parts[1]), float(parts[2]))
+                radius = float(parts[3])
+                material = materials[parts[4]]
+                scene["spheres"].append(Sphere(center, radius, material))
+            elif scene_object_type == "lights":
+                position = Vector(float(parts[0]), float(parts[1]), float(parts[2]))
+                intensity = float(parts[3])
+                scene["lights"].append(Light(position, intensity))
+
+    return scene
+
+
 def main():
-    ivory = Material(1.0, Vector(0.6, 0.3, 0.1, 0.0), Vector(0.4, 0.4, 0.3), 50)
-    glass = Material(1.5, Vector(0.0, 0.5, 0.1, 0.8), Vector(0.6, 0.7, 0.8), 125)
-    red_rubber = Material(1.0, Vector(0.9, 0.1, 0.0, 0.0), Vector(0.3, 0.1, 0.1), 10)
-    mirror = Material(1.0, Vector(0.0, 10.0, 0.8, 0.0), Vector(1.0, 1.0, 1.0), 1425)
-
-    spheres = [
-        Sphere(Vector(-3, 0, -16), 2, ivory),
-        Sphere(Vector(-1.0, -1.5, -12), 2, glass),
-        Sphere(Vector(1.5, -0.5, -18), 3, red_rubber),
-        Sphere(
-            Vector(
-                7,
-                5,
-                -18,
-            ),
-            4,
-            mirror,
-        ),
-    ]
-
-    lights = [
-        Light(Vector(-20, 20, 20), 1.5),
-        Light(Vector(30, 50, -25), 1.8),
-        Light(Vector(30, 20, 30), 1.7),
-    ]
-
-    render(spheres, lights)
+    scene = read_scene(
+        "https://gist.githubusercontent.com/fibbo/1cee2353e67dba182f8f3c6d275c23ba/raw/1b43758911f801d2369c59004360e66826832f92/scene_01.txt"
+    )
+    render(scene)
 
 
 main()
