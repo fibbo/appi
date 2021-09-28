@@ -6,25 +6,62 @@ import requests as req
 float_max = sys.float_info.max
 
 
-class Light:
+class SceneBase:
+    def __str__(self):
+        raise NotImplementedError(
+            "This function should be implemented in derived classes"
+        )
+
+
+class Scene(SceneBase):
+    def __init__(self, lights=[], spheres=[]):
+        self.lights = lights
+        self.spheres = spheres
+
+    def __getitem__(self, name):
+        if name == "lights":
+            return self.lights
+        if name == "spheres":
+            return self.spheres
+
+    def __str__(self):
+        output = ""
+        for light in self.lights:
+            output += light.__str__() + "\n"
+        for sphere in self.spheres:
+            output += sphere.__str__() + "\n"
+        return output
+
+
+class Light(SceneBase):
     def __init__(self, position, intensity):
         self.position = position
         self.intensity = intensity
 
+    def __str__(self):
+        return f"Light - position: {self.position} with intensity {self.intensity}"
 
-class Material:
-    def __init__(self, refrac_index, albedo, diffuse_color, specular_exponent):
+
+class Material(SceneBase):
+    def __init__(self, name, refrac_index, albedo, diffuse_color, specular_exponent):
+        self.name = name
         self.refractive_index = refrac_index
         self.albedo = albedo
         self.diffuse_color = diffuse_color
         self.specular_exponent = specular_exponent
 
+    def __str__(self):
+        return f"{self.name} - refractive index: {self.refractive_index}, albedo: {self.albedo}, diffuse color: {self.diffuse_color}, specular exponent: {self.specular_exponent}"
 
-class Sphere:
+
+class Sphere(SceneBase):
     def __init__(self, center, radius, material):
         self.center = center
         self.radius = radius
         self.material = material
+
+    def __str__(self):
+        return f"Sphere - center: {self.center}, radius: {self.radius}, {self.material}"
 
 
 def ray_sphere_intersect(origin, direction, sphere):
@@ -92,7 +129,7 @@ def scene_intersect(origin, direction, spheres):
                 if (int(0.5 * hit.x + 1000) + int(0.5 * hit.z)) & 1
                 else Vector(0.3, 0.2, 0.1)
             )
-            material = Material(1, Vector(1, 0, 0, 0), diffuse_color, 0)
+            material = Material("checkerboard", 1, Vector(1, 0, 0, 0), diffuse_color, 0)
 
     return (min(spheres_dist, checkerboard_dist) < 1000, hit, normal, material)
 
@@ -165,9 +202,8 @@ def render(scene):
 
 
 def read_scene(url):
-    scene = {}
-    scene["lights"] = []
-    scene["spheres"] = []
+    lights = []
+    spheres = []
     materials = {}
 
     answer = req.get(url)
@@ -188,24 +224,26 @@ def read_scene(url):
                 )
                 color = Vector(float(parts[6]), float(parts[7]), float(parts[8]))
                 specular = float(parts[9])
-                materials[name] = Material(refractive, albedo, color, specular)
+                materials[name] = Material(name, refractive, albedo, color, specular)
             elif scene_object_type == "spheres":
                 center = Vector(float(parts[0]), float(parts[1]), float(parts[2]))
                 radius = float(parts[3])
                 material = materials[parts[4]]
-                scene["spheres"].append(Sphere(center, radius, material))
+                spheres.append(Sphere(center, radius, material))
             elif scene_object_type == "lights":
                 position = Vector(float(parts[0]), float(parts[1]), float(parts[2]))
                 intensity = float(parts[3])
-                scene["lights"].append(Light(position, intensity))
+                lights.append(Light(position, intensity))
 
-    return scene
+    return Scene(lights=lights, spheres=spheres)
 
 
 def main():
     scene = read_scene(
         "https://gist.githubusercontent.com/fibbo/1cee2353e67dba182f8f3c6d275c23ba/raw/1b43758911f801d2369c59004360e66826832f92/scene_01.txt"
     )
+
+    print(scene)
     render(scene)
 
 
