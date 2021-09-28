@@ -9,7 +9,7 @@ class Vector:
         self.size = len(self.components)
 
     def __str__(self):
-        return str(self.components)
+        return f"Vector{self.size}: {self.components}"
 
     @property
     def x(self):
