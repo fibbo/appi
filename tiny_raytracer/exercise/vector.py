@@ -16,19 +16,22 @@ class Vector:
 
     # TODO: Implement cross product
 
-    # TODO: Implement __getitem__
-
-    # TODO: Implement __neg__ (additive inverse)
-    
-    # TODO: Implement __mul__ (multiplication)
+    # TODO: Implement __add__
 
     # TODO: Implement __sub__ (subtraction)
 
-    # TODO: Implement division
-    
-    # TODO: Implement __add__
+    # TODO: Implement division (which special function name is the correct one?)
+
+    # TODO: Implement __mul__ (multiplication)
+
+    # TODO: Try vector * scalar and scalar * vector
+
+    # TODO: Implement __neg__ (additive inverse)
 
     # TODO: Implement __eq__
+
+    # TODO: Implement __getitem__
+
     pass
 
 

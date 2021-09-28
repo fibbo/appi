@@ -36,9 +36,13 @@ class Vector:
         for i in range(self.size):
             scalar_product += self.components[i] * other.components[i]
         return scalar_product
-
+        
     def norm(self):
         return math.sqrt(self[0] * self[0] + self[1] * self[1] + self[2] * self[2])
+
+    def normalize(self, length=1):
+        assert self.size == 3
+        return self / (length * self.norm())
 
     def cross(self, rhs):
         assert self.size == 3 and rhs.size == 3
@@ -48,21 +52,13 @@ class Vector:
             self[0] * rhs[1] - self[1] * rhs[0],
         )
 
-    def __getitem__(self, index):
-        assert self.size > index
-        return self.components[index]
 
-    def __neg__(self):
-        return self * -1
-
-    def __mul__(self, scalar):
+    def __add__(self, other):
         new_vec = []
+        assert self.size == other.size
         for i in range(self.size):
-            new_vec.append(self.components[i] * scalar)
+            new_vec.append(self.components[i] + other.components[i])
         return Vector(*new_vec)
-
-    def __rmul__(self, scalar):
-        return self * scalar
 
     def __sub__(self, other):
         new_vec = []
@@ -77,12 +73,21 @@ class Vector:
             new_vec.append(self.components[i] / scalar)
         return Vector(*new_vec)
 
-    def __add__(self, other):
+    def __getitem__(self, index):
+        assert self.size > index
+        return self.components[index]
+
+    def __mul__(self, scalar):
         new_vec = []
-        assert self.size == other.size
         for i in range(self.size):
-            new_vec.append(self.components[i] + other.components[i])
+            new_vec.append(self.components[i] * scalar)
         return Vector(*new_vec)
+
+    def __rmul__(self, scalar):
+        return self * scalar
+
+    def __neg__(self):
+        return self * -1
 
     def __eq__(self, other):
         if len(self.components) != other.size:
@@ -91,10 +96,6 @@ class Vector:
             if self.components[i] != other.components[i]:
                 return False
         return True
-
-    def normalize(self, length=1):
-        assert self.size == 3
-        return self / (length * self.norm())
 
 
 def tests():
