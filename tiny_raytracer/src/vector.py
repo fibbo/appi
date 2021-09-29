@@ -11,6 +11,9 @@ class Vector:
     def __str__(self):
         return f"Vector{self.size}: {self.components}"
 
+    def __repr__(self):
+        return self.__str__()
+
     @property
     def x(self):
         return self.components[0]
@@ -36,7 +39,7 @@ class Vector:
         for i in range(self.size):
             scalar_product += self.components[i] * other.components[i]
         return scalar_product
-        
+
     def norm(self):
         return math.sqrt(self[0] * self[0] + self[1] * self[1] + self[2] * self[2])
 
@@ -51,7 +54,6 @@ class Vector:
             self[2] * rhs[0] - self[0] * rhs[2],
             self[0] * rhs[1] - self[1] * rhs[0],
         )
-
 
     def __add__(self, other):
         new_vec = []
@@ -96,42 +98,3 @@ class Vector:
             if self.components[i] != other.components[i]:
                 return False
         return True
-
-
-def tests():
-    a = Vector(1, 0, 0)
-    b = Vector(2, 1, 1)
-    c = Vector(3, 4, 5)
-
-    assert a == Vector(1, 0, 0)
-
-    res1 = 2 * b
-    res2 = b * 2
-
-    assert res1 == Vector(4, 2, 2)
-    assert res1 == res2
-
-    assert -b == Vector(-2, -1, -1)
-    assert b == Vector(2, 1, 1)
-
-    n = a.normalize()
-
-    assert n.norm() == 1.0
-
-    assert a.dot(c) == c.dot(a)
-
-    assert b.cross(c) == Vector(1, -7, 5)
-    assert c.cross(b) == -b.cross(c)
-
-    assert a + b == Vector(3, 1, 1)
-
-    d = Vector(1, 2, 3, 4)
-    e = d * 2
-    assert e == Vector(2, 4, 6, 8)
-    assert e / 2 == d
-
-    print("All tests successful")
-
-
-if __name__ == "__main__":
-    tests()
