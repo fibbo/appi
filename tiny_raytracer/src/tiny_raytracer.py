@@ -65,6 +65,9 @@ class Sphere(SceneBase):
 
 
 def ray_sphere_intersect(origin, direction, sphere):
+    """
+    Check whether a ray intersect with a given sphere or not
+    """
     l = sphere.center - origin
     tca = l.dot(direction)
     d2 = l.dot(l) - tca * tca
@@ -82,10 +85,16 @@ def ray_sphere_intersect(origin, direction, sphere):
 
 
 def reflect(incoming, normal):
+    """
+    Calculate reflection direction
+    """
     return incoming - normal * 2.0 * (incoming.dot(normal))
 
 
 def refract(incoming, normal, eta_t, eta_i=1.0):
+    """
+    Calculate refraction direction
+    """
     cosi = -max(-1.0, min(1.0, incoming.dot(normal)))
     if cosi < 0:
         return refract(incoming, -normal, eta_i, eta_t)
@@ -98,6 +107,9 @@ def refract(incoming, normal, eta_t, eta_i=1.0):
 
 
 def scene_intersect(origin, direction, spheres):
+    """
+    Check if a given origin/direction pair intersects with any scene objects (in this case only spheres)
+    """
     spheres_dist = float_max
     hit = None
     normal = None
@@ -135,6 +147,12 @@ def scene_intersect(origin, direction, spheres):
 
 
 def cast_ray(origin, direction, spheres, lights, depth=0):
+    """
+    For each call intersect the ray with the scene and calculate the color of the destination. Recursive calls for reflections
+    and refractions (up to 4 times).
+
+    Returns the calculated color of a pixel.
+    """
 
     if depth > 4:
         return Vector(0.2, 0.7, 0.8)
@@ -173,6 +191,11 @@ def cast_ray(origin, direction, spheres, lights, depth=0):
 
 
 def render(scene):
+    """
+    Render the scene. For each pixel send out a ray into the canvas and try intersecting with the
+    scene objects behind it.
+    At the end the framebuffer is written to a file as ppm.
+    """
     width = 400
     height = 200
     fov = math.pi / 3.0
