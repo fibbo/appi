@@ -79,11 +79,18 @@ class Vector:
         assert self.size > index
         return self.components[index]
 
-    def __mul__(self, scalar):
-        new_vec = []
-        for i in range(self.size):
-            new_vec.append(self.components[i] * scalar)
-        return Vector(*new_vec)
+    def __mul__(self, rhs):
+        if isinstance(rhs, Vector):
+            scalar_product = 0
+            assert self.size == rhs.size
+            for i in range(self.size):
+                scalar_product += self.components[i] * rhs.components[i]
+            return scalar_product
+        else:
+            new_vec = []
+            for i in range(self.size):
+                new_vec.append(self.components[i] * rhs)
+            return Vector(*new_vec)
 
     def __rmul__(self, scalar):
         return self * scalar

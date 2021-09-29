@@ -37,6 +37,12 @@ class VectorTests(unittest.TestCase):
     def test_dot_product(self):
         c = self.a.dot(self.b)
         self.assertEqual(c, 12.0)
+        c = self.b.dot(self.a)
+        self.assertEqual(c, 12.0)
+        c = self.a * self.b
+        self.assertEqual(c, 12.0)
+        c = self.b * self.a
+        self.assertEqual(c, 12.0)
 
     def test_norm(self):
         c = self.a.norm()
