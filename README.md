@@ -31,3 +31,7 @@ This folder will contain Python source files. Potentially with subfolders like `
 ## Powerpoint
 
 The presentation is shared here: https://1drv.ms/p/s!AlQXFUn0ctPihfpVTOoC7x7xzudaPA?e=rvk7Mc
+
+## TODO
+* Add json scene description
+* Add json scene parser
