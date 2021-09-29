@@ -4,3 +4,4 @@
 *.out
 presentation/~*
 __pycache__/
+.envrc
