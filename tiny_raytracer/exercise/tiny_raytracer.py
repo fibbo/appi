@@ -7,8 +7,20 @@ float_max = sys.float_info.max
 
 
 class SceneBase:
-    # TODO: Implement __str__
-    pass
+    def __str__(self):
+        raise NotImplementedError(
+            "This function should be implemented in derived classes."
+        )
+
+    def to_json(self):
+        raise NotImplementedError(
+            "This function should be implemented in derived classes."
+        )
+
+    def from_json(self, json):
+        raise NotImplementedError(
+            "This function should be implemented in derived classes."
+        )
 
 
 class Scene(SceneBase):
@@ -17,6 +29,10 @@ class Scene(SceneBase):
     # TODO: Implement __getitem__
 
     # TODO: Implement __str__
+
+    # TODO: Implement to_json
+
+    # TODO: Implement from_json
     pass
 
 
@@ -24,6 +40,9 @@ class Light(SceneBase):
     # TODO: Implement constructor
 
     # TODO: Implement __str__
+
+    # TODO: Implement to_json
+
     pass
 
 
@@ -31,6 +50,9 @@ class Material(SceneBase):
     # TODO: Implement constructor
 
     # TODO: Implement __str__
+
+    # TODO: Implement to_json
+
     pass
 
 
@@ -38,6 +60,9 @@ class Sphere(SceneBase):
     # TODO: Implement constructor
 
     # TODO: Implement __str__
+
+    # TODO: Implement to_json
+
     pass
 
 
@@ -186,6 +211,20 @@ def read_scene(url):
     # TODO: Get text from url and parse the scene
 
     return Scene(lights=lights, spheres=spheres)
+
+
+def write_scene_to_file(scene, file_name):
+    with open(file_name, "w") as f:
+        scene_string = scene.to_json()
+        f.write(scene_string)
+
+
+def load_scene_from_file(file_name):
+    scene = Scene()
+    with open(file_name, "r") as f:
+        for line in f:
+            scene.from_json(line)
+            return scene
 
 
 def main():

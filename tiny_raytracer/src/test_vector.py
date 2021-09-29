@@ -77,5 +77,10 @@ class VectorTests(unittest.TestCase):
         c = 3 * self.a
         self.assertEqual(c, Vector(3.0, 3.0, 3.0))
 
+    def test_construct_from_list(self):
+        points = [1, 2, 3]
+        v = Vector(points)
+        self.assertEqual(v, Vector(1, 2, 3))
+
 
 unittest.main()

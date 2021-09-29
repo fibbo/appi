@@ -1,18 +1,30 @@
 import math
+import json
 
 
 class Vector:
     def __init__(self, *args):
-        self.components = []
-        for i in args:
-            self.components.append(i)
-        self.size = len(self.components)
+        if len(args) == 1 and isinstance(args[0], str):
+            vector = json.loads(args[0])
+            self.components = vector
+            self.size = len(vector)
+        elif len(args) == 1 and isinstance(args[0], list):
+            self.components = args[0]
+            self.size = len(args[0])
+        else:
+            self.components = []
+            for i in args:
+                self.components.append(i)
+            self.size = len(self.components)
 
     def __str__(self):
         return f"Vector{self.size}: {self.components}"
 
     def __repr__(self):
         return self.__str__()
+
+    def to_json(self):
+        return json.dumps(self.components)
 
     @property
     def x(self):
