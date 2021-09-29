@@ -33,11 +33,11 @@ class Vector:
         assert self.size >= 4
         return self.components[3]
 
-    def dot(self, other):
+    def dot(self, rhs):
         scalar_product = 0
-        assert self.size == other.size
+        assert self.size == rhs.size
         for i in range(self.size):
-            scalar_product += self.components[i] * other.components[i]
+            scalar_product += self.components[i] * rhs.components[i]
         return scalar_product
 
     def norm(self):
@@ -55,24 +55,24 @@ class Vector:
             self[0] * rhs[1] - self[1] * rhs[0],
         )
 
-    def __add__(self, other):
+    def __add__(self, rhs):
         new_vec = []
-        assert self.size == other.size
+        assert self.size == rhs.size
         for i in range(self.size):
-            new_vec.append(self.components[i] + other.components[i])
+            new_vec.append(self.components[i] + rhs.components[i])
         return Vector(*new_vec)
 
-    def __sub__(self, other):
+    def __sub__(self, rhs):
         new_vec = []
-        assert self.size == other.size
+        assert self.size == rhs.size
         for i in range(self.size):
-            new_vec.append(self.components[i] - other.components[i])
+            new_vec.append(self.components[i] - rhs.components[i])
         return Vector(*new_vec)
 
-    def __truediv__(self, scalar):
+    def __truediv__(self, divisor):
         new_vec = []
         for i in range(self.size):
-            new_vec.append(self.components[i] / scalar)
+            new_vec.append(self.components[i] / divisor)
         return Vector(*new_vec)
 
     def __getitem__(self, index):
@@ -91,10 +91,10 @@ class Vector:
     def __neg__(self):
         return self * -1
 
-    def __eq__(self, other):
-        if len(self.components) != other.size:
+    def __eq__(self, rhs):
+        if len(self.components) != rhs.size:
             return False
         for i in range(self.size):
-            if self.components[i] != other.components[i]:
+            if self.components[i] != rhs.components[i]:
                 return False
         return True
