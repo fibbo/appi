@@ -295,8 +295,8 @@ def render(scene):
     scene objects behind it.
     At the end the framebuffer is written to a file as ppm.
     """
-    width = 1024
-    height = 768
+    width = 400
+    height = 200
     fov = math.pi / 3.0
     framebuffer = width * height * [None]
     for j in range(height):
@@ -311,7 +311,7 @@ def render(scene):
                 scene["lights"],
             )
 
-    with open("out.ppm", "wb") as f:
+    with open("presentation.ppm", "wb") as f:
         f.write(bytearray(f"P6 {width} {height} 255\n", "ascii"))
         counter = 0
         for vec in framebuffer:
@@ -389,11 +389,11 @@ def main():
     scene = read_scene(
         "https://gist.githubusercontent.com/fibbo/1cee2353e67dba182f8f3c6d275c23ba/raw/1b43758911f801d2369c59004360e66826832f92/scene_01.txt"
     )
-    write_scene_to_file(scene, "scene_json.txt")
-    scene2 = load_scene_from_file("scene_json.txt")
-    read_scene_from_json(
-        "https://gist.githubusercontent.com/fibbo/4d80c86da18d52c968fff5e4f78c4a04/raw/5b29f04bd62afe224b816f7e81a9bfb9ae68eab3/scene_01.json"
-    )
+    # write_scene_to_file(scene, "scene_json.txt")
+    # scene2 = load_scene_from_file("scene_json.txt")
+    # read_scene_from_json(
+    #     "https://gist.githubusercontent.com/fibbo/4d80c86da18d52c968fff5e4f78c4a04/raw/5b29f04bd62afe224b816f7e81a9bfb9ae68eab3/scene_01.json"
+    # )
     render(scene)
 
     # print(scene)
