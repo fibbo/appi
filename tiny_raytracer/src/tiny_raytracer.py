@@ -90,6 +90,9 @@ class Light(SceneBase):
         light_dict = {"position": self.position.to_json(), "intensity": self.intensity}
         return json.dumps(light_dict)
 
+    def __eq__(self, other):
+        return self.intensity == other.intensity and self.position == other.position
+
 
 class Material(SceneBase):
     """
@@ -120,6 +123,15 @@ class Material(SceneBase):
 
     def __str__(self):
         return f"{self.name} - refractive index: {self.refractive_index}, albedo: {self.albedo}, diffuse color: {self.diffuse_color}, specular exponent: {self.specular_exponent}"
+
+    def __eq__(self, other):
+        return (
+            self.name == other.name
+            and self.specular_exponent == other.specular_exponent
+            and self.albedo == other.albedo
+            and self.refractive_index == other.refractive_index
+            and self.diffuse_color == other.diffuse_color
+        )
 
     def to_json(self):
         material_dict = {
@@ -401,4 +413,5 @@ def main():
     # render(scene)
 
 
-main()
+if __name__ == "__main__":
+    main()
