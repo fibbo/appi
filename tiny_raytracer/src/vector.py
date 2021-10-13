@@ -62,9 +62,9 @@ class Vector:
     def cross(self, rhs):
         assert self.size == 3 and rhs.size == 3
         return Vector(
-            self[1] * rhs[2] - self[2] * rhs[1],
-            self[2] * rhs[0] - self[0] * rhs[2],
-            self[0] * rhs[1] - self[1] * rhs[0],
+            self.y * rhs.z - self.z * rhs.y,
+            self.z * rhs.x - self.x * rhs.z,
+            self.x * rhs.y - self.y * rhs.x,
         )
 
     def __add__(self, rhs):
@@ -92,17 +92,10 @@ class Vector:
         return self.components[index]
 
     def __mul__(self, rhs):
-        if isinstance(rhs, Vector):
-            scalar_product = 0
-            assert self.size == rhs.size
-            for i in range(self.size):
-                scalar_product += self.components[i] * rhs.components[i]
-            return scalar_product
-        else:
-            new_vec = []
-            for i in range(self.size):
-                new_vec.append(self.components[i] * rhs)
-            return Vector(*new_vec)
+        new_vec = []
+        for i in range(self.size):
+            new_vec.append(self.components[i] * rhs)
+        return Vector(*new_vec)
 
     def __rmul__(self, scalar):
         return self * scalar
@@ -111,7 +104,7 @@ class Vector:
         return self * -1
 
     def __eq__(self, rhs):
-        if len(self.components) != rhs.size:
+        if self.size != rhs.size:
             return False
         for i in range(self.size):
             if self.components[i] != rhs.components[i]:
