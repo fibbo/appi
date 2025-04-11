@@ -1,73 +1,13 @@
 import math
 import sys
+
+from light import Light
+from material import Material
+from scene import Scene
+from sphere import Sphere
 from vector import Vector
-import requests as req
 
 float_max = sys.float_info.max
-
-
-class SceneBase:
-    def __str__(self):
-        raise NotImplementedError(
-            "This function should be implemented in derived classes."
-        )
-
-    def to_json(self):
-        raise NotImplementedError(
-            "This function should be implemented in derived classes."
-        )
-
-    def from_json(self, json):
-        raise NotImplementedError(
-            "This function should be implemented in derived classes."
-        )
-
-
-class Scene(SceneBase):
-    # TODO: Implement constructor
-
-    # TODO: Implement __getitem__
-
-    # TODO: Implement __str__
-
-    # TODO: Implement to_json
-
-    # TODO: Implement from_json
-    pass
-
-
-class Light(SceneBase):
-    # TODO: Implement constructor
-
-    # TODO: Implement __str__
-
-    # TODO: Implement to_json
-
-    # TODO: Implement __eq__
-
-    pass
-
-
-class Material(SceneBase):
-    # TODO: Implement constructor
-
-    # TODO: Implement __str__
-
-    # TODO: Implement to_json
-
-    pass
-
-
-class Sphere(SceneBase):
-    # TODO: Implement constructor
-
-    # TODO: Implement __str__
-
-    # TODO: Implement to_json
-
-    # TODO: Implement __eq__
-
-    pass
 
 
 def ray_sphere_intersect(origin, direction, sphere):
@@ -141,7 +81,6 @@ def scene_intersect(origin, direction, spheres):
 
 
 def cast_ray(origin, direction, spheres, lights, depth=0):
-
     if depth > 4:
         return Vector(0.2, 0.7, 0.8)
     has_hit, point, normal, material = scene_intersect(origin, direction, spheres)
