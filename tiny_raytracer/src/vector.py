@@ -1,30 +1,19 @@
-import math
 import json
+import math
 
 
 class Vector:
     def __init__(self, *args):
-        if len(args) == 1 and isinstance(args[0], str):
-            vector = json.loads(args[0])
-            self.components = vector
-            self.size = len(vector)
-        elif len(args) == 1 and isinstance(args[0], list):
-            self.components = args[0]
-            self.size = len(args[0])
-        else:
-            self.components = []
-            for i in args:
-                self.components.append(i)
-            self.size = len(self.components)
+        self.components = []
+        for n in args:
+            self.components.append(n)
+        self.size = len(self.components)
 
     def __str__(self):
-        return f"Vector{self.size}: {self.components}"
+        return str(self.components)
 
     def __repr__(self):
         return self.__str__()
-
-    def to_json(self):
-        return json.dumps(self.components)
 
     @property
     def x(self):
@@ -32,18 +21,11 @@ class Vector:
 
     @property
     def y(self):
-        assert self.size >= 2
         return self.components[1]
 
     @property
     def z(self):
-        assert self.size >= 3
         return self.components[2]
-
-    @property
-    def w(self):
-        assert self.size >= 4
-        return self.components[3]
 
     def dot(self, rhs):
         scalar_product = 0
@@ -55,12 +37,12 @@ class Vector:
     def norm(self):
         return math.sqrt(self[0] * self[0] + self[1] * self[1] + self[2] * self[2])
 
+    # TODO: Implement normalize
     def normalize(self, length=1):
         assert self.size == 3
         return self / (length * self.norm())
 
     def cross(self, rhs):
-        assert self.size == 3 and rhs.size == 3
         return Vector(
             self.y * rhs.z - self.z * rhs.y,
             self.z * rhs.x - self.x * rhs.z,
@@ -69,36 +51,38 @@ class Vector:
 
     def __add__(self, rhs):
         new_vec = []
-        assert self.size == rhs.size
         for i in range(self.size):
             new_vec.append(self.components[i] + rhs.components[i])
+
+        # *new_vec unpacks the list. So instead of Vector([1,2,3])
+        # it calls Vector(1, 2, 3)
         return Vector(*new_vec)
 
     def __sub__(self, rhs):
         new_vec = []
-        assert self.size == rhs.size
         for i in range(self.size):
             new_vec.append(self.components[i] - rhs.components[i])
+
+        # *new_vec unpacks the list. So instead of Vector([1,2,3])
+        # it calls Vector(1, 2, 3)
         return Vector(*new_vec)
 
-    def __truediv__(self, divisor):
+    def __truediv__(self, rhs):
         new_vec = []
         for i in range(self.size):
-            new_vec.append(self.components[i] / divisor)
-        return Vector(*new_vec)
+            new_vec.append(self.components[i] / rhs)
 
-    def __getitem__(self, index):
-        assert self.size > index
-        return self.components[index]
+        return Vector(*new_vec)
 
     def __mul__(self, rhs):
         new_vec = []
         for i in range(self.size):
             new_vec.append(self.components[i] * rhs)
+
         return Vector(*new_vec)
 
-    def __rmul__(self, scalar):
-        return self * scalar
+    def __rmul__(self, rhs):
+        return self * rhs
 
     def __neg__(self):
         return self * -1
@@ -110,3 +94,16 @@ class Vector:
             if self.components[i] != rhs.components[i]:
                 return False
         return True
+
+    def __getitem__(self, index):
+        return self.components[index]
+
+    def to_json(self):
+        return json.dumps(self.components)
+
+
+if __name__ == "__main__":
+    vector = Vector(1, 2, 3, 4, 5)
+    print("This is printed from vector.py")
+    print(vector.x)
+    print(vector[0])

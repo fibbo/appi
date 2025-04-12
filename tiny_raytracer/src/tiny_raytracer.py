@@ -1,211 +1,45 @@
 import math
 import sys
+
+from light import Light
+from material import Material
+from scene import Scene
+from sphere import Sphere
 from vector import Vector
-import json
-import requests as req
 
 float_max = sys.float_info.max
 
 
-class SceneBase:
-    """
-    Scene base class. Classes derived from this should be either scenes or scene objects.
-    """
+def ray_sphere_intersect(ray_origin, ray_direction, sphere):
+    vector_to_sphere = sphere.center - ray_origin
+    projection_length = vector_to_sphere.dot(ray_direction)
+    perpendicular_distance_squared = (
+        vector_to_sphere.dot(vector_to_sphere) - projection_length * projection_length
+    )
 
-    def __str__(self):
-        raise NotImplementedError(
-            "This function should be implemented in derived classes."
-        )
-
-    def to_json(self):
-        raise NotImplementedError(
-            "This function should be implemented in derived classes."
-        )
-
-
-class Scene(SceneBase):
-    """
-    Scene class. Contains the information of the scene such as Lights and Spheres
-    """
-
-    def __init__(self, lights=[], spheres=[]):
-        self.lights = lights
-        self.spheres = spheres
-
-    def __getitem__(self, name):
-        if name == "lights":
-            return self.lights
-        if name == "spheres":
-            return self.spheres
-
-    def __str__(self):
-        output = ""
-        for light in self.lights:
-            output += light.__str__() + "\n"
-        for sphere in self.spheres:
-            output += sphere.__str__() + "\n"
-        return output
-
-    def to_json(self):
-        scene_dict = {"lights": [], "spheres": []}
-        for light in self.lights:
-            scene_dict["lights"].append(light.to_json())
-        for sphere in self.spheres:
-            scene_dict["spheres"].append(sphere.to_json())
-
-        return json.dumps(scene_dict)
-
-    def from_json(self, json_string):
-        scene_dict = json.loads(json_string)
-        if "lights" in scene_dict:
-            for light in scene_dict["lights"]:
-                self.lights.append(Light(light))
-        if "spheres" in scene_dict:
-            for sphere in scene_dict["spheres"]:
-                self.spheres.append(Sphere(sphere))
-
-
-class Light(SceneBase):
-    """
-    Point light source with a position and an intensity (but not a color)
-    """
-
-    def __init__(self, *args):
-        if len(args) == 2:
-            self.position = args[0]
-            self.intensity = args[1]
-            return
-        if len(args) == 1 and isinstance(args[0], str):
-            light_dict = json.loads(args[0])
-        elif len(args) == 1 and isinstance(args[0], dict):
-            light_dict = args[0]
-
-        self.intensity = light_dict["intensity"]
-        self.position = Vector(light_dict["position"])
-
-    def __str__(self):
-        return f"Light - position: {self.position} with intensity {self.intensity}"
-
-    def to_json(self):
-        light_dict = {"position": self.position.to_json(), "intensity": self.intensity}
-        return json.dumps(light_dict)
-
-    def __eq__(self, other):
-        return self.intensity == other.intensity and self.position == other.position
-
-
-class Material(SceneBase):
-    """
-    Material which is used to calculate the color of a ray or the refraction
-    has to be calculated.
-    """
-
-    def __init__(self, *args):
-        material_dict = None
-        if len(args) == 5:
-            self.name = args[0]
-            self.refractive_index = args[1]
-            self.albedo = args[2]
-            self.diffuse_color = args[3]
-            self.specular_exponent = args[4]
-            return
-
-        if len(args) == 1 and isinstance(args[0], str):
-            material_dict = json.loads(args[0])
-        if len(args) == 1 and isinstance(args[0], dict):
-            material_dict = args[0]
-
-        self.name = material_dict["name"]
-        self.refractive_index = material_dict["refractive_index"]
-        self.albedo = Vector(material_dict["albedo"])
-        self.diffuse_color = Vector(material_dict["diffuse_color"])
-        self.specular_exponent = material_dict["specular_exponent"]
-
-    def __str__(self):
-        return f"{self.name} - refractive index: {self.refractive_index}, albedo: {self.albedo}, diffuse color: {self.diffuse_color}, specular exponent: {self.specular_exponent}"
-
-    def __eq__(self, other):
-        return (
-            self.name == other.name
-            and self.specular_exponent == other.specular_exponent
-            and self.albedo == other.albedo
-            and self.refractive_index == other.refractive_index
-            and self.diffuse_color == other.diffuse_color
-        )
-
-    def to_json(self):
-        material_dict = {
-            "name": self.name,
-            "refractive_index": self.refractive_index,
-            "albedo": self.albedo.to_json(),
-            "diffuse_color": self.diffuse_color.to_json(),
-            "specular_exponent": self.specular_exponent,
-        }
-        return json.dumps(material_dict)
-
-
-class Sphere(SceneBase):
-    """
-    Simplest scene object. Has a center, radius and material
-    """
-
-    def __init__(self, *args):
-        if len(args) == 3:
-            self.center = args[0]
-            self.radius = args[1]
-            self.material = args[2]
-            return
-        if len(args) == 1 and isinstance(args[0], str):
-            sphere_dict = json.loads(args[0])
-        if len(args) == 1 and isinstance(args[0], dict):
-            sphere_dict = args[0]
-        self.center = Vector(sphere_dict["center"])
-        self.radius = sphere_dict["radius"]
-        self.material = Material(sphere_dict["material"])
-
-    def __str__(self):
-        return f"Sphere - center: {self.center}, radius: {self.radius}, {self.material}"
-
-    def to_json(self):
-        sphere_dict = {
-            "center": self.center.to_json(),
-            "radius": self.radius,
-            "material": self.material.to_json(),
-        }
-        return json.dumps(sphere_dict)
-
-
-def ray_sphere_intersect(origin, direction, sphere):
-    """
-    Check whether a ray intersect with a given sphere or not
-    """
-    l = sphere.center - origin
-    tca = l.dot(direction)
-    d2 = l.dot(l) - tca * tca
-    if d2 > sphere.radius * sphere.radius:
-        return (False, 0)
-    thc = math.sqrt(sphere.radius * sphere.radius - d2)
-    t0 = tca - thc
-    t1 = tca + thc
-    if t0 < 1e-3:
-        t0 = t1
-    if t0 < 1e-3:
+    if perpendicular_distance_squared > sphere.radius * sphere.radius:
         return (False, 0)
 
-    return (True, t0)
+    half_chord_length = math.sqrt(
+        sphere.radius * sphere.radius - perpendicular_distance_squared
+    )
+    intersection_distance_1 = projection_length - half_chord_length
+    intersection_distance_2 = projection_length + half_chord_length
+
+    if intersection_distance_1 < 1e-3:
+        intersection_distance_1 = intersection_distance_2
+
+    if intersection_distance_1 < 1e-3:
+        return (False, 0)
+
+    return (True, intersection_distance_1)
 
 
 def reflect(incoming, normal):
-    """
-    Calculate reflection direction
-    """
     return incoming - normal * 2.0 * (incoming.dot(normal))
 
 
 def refract(incoming, normal, eta_t, eta_i=1.0):
-    """
-    Calculate refraction direction
-    """
     cosi = -max(-1.0, min(1.0, incoming.dot(normal)))
     if cosi < 0:
         return refract(incoming, -normal, eta_i, eta_t)
@@ -218,9 +52,6 @@ def refract(incoming, normal, eta_t, eta_i=1.0):
 
 
 def scene_intersect(origin, direction, spheres):
-    """
-    Check if a given origin/direction pair intersects with any scene objects (in this case only spheres)
-    """
     spheres_dist = float_max
     hit = None
     normal = None
@@ -258,13 +89,6 @@ def scene_intersect(origin, direction, spheres):
 
 
 def cast_ray(origin, direction, spheres, lights, depth=0):
-    """
-    For each call intersect the ray with the scene and calculate the color of the destination. Recursive calls for reflections
-    and refractions (up to 4 times).
-
-    Returns the calculated color of a pixel.
-    """
-
     if depth > 4:
         return Vector(0.2, 0.7, 0.8)
     has_hit, point, normal, material = scene_intersect(origin, direction, spheres)
@@ -302,13 +126,10 @@ def cast_ray(origin, direction, spheres, lights, depth=0):
 
 
 def render(scene):
-    """
-    Render the scene. For each pixel send out a ray into the canvas and try intersecting with the
-    scene objects behind it.
-    At the end the framebuffer is written to a file as ppm.
-    """
     width = 400
     height = 200
+    # Change the width and height if you want a larger
+    # or smaller image.
     fov = math.pi / 3.0
     framebuffer = width * height * [None]
     for j in range(height):
@@ -323,7 +144,7 @@ def render(scene):
                 scene["lights"],
             )
 
-    with open("presentation.ppm", "wb") as f:
+    with open("out.ppm", "wb") as f:
         f.write(bytearray(f"P6 {width} {height} 255\n", "ascii"))
         counter = 0
         for vec in framebuffer:
@@ -369,19 +190,6 @@ def read_scene(url):
                 intensity = float(parts[3])
                 lights.append(Light(position, intensity))
 
-    return Scene(lights=lights, spheres=spheres)
-
-
-def read_scene_from_json(url):
-    answer = req.get(url)
-    scene_json = answer.json()
-    scene = Scene()
-    materials = {}
-    for light in scene_json["lights"]:
-        scene.lights.append(Light(light))
-    for material in scene_json["materials"]:
-        materials[material["name"]] = Material(material)
-
 
 def write_scene_to_file(scene, file_name):
     with open(file_name, "w") as f:
@@ -398,19 +206,42 @@ def load_scene_from_file(file_name):
 
 
 def main():
-    scene = read_scene(
-        "https://gist.githubusercontent.com/fibbo/1cee2353e67dba182f8f3c6d275c23ba/raw/1b43758911f801d2369c59004360e66826832f92/scene_01.txt"
+    ivory = Material(
+        "ivory", 1.0, Vector(0.6, 0.3, 0.1, 0.0), Vector(0.4, 0.4, 0.3), 50
     )
-    # write_scene_to_file(scene, "scene_json.txt")
-    # scene2 = load_scene_from_file("scene_json.txt")
-    # read_scene_from_json(
-    #     "https://gist.githubusercontent.com/fibbo/4d80c86da18d52c968fff5e4f78c4a04/raw/5b29f04bd62afe224b816f7e81a9bfb9ae68eab3/scene_01.json"
-    # )
-    render(scene)
+    glass = Material(
+        "glass", 1.5, Vector(0.0, 0.5, 0.1, 0.8), Vector(0.6, 0.7, 0.8), 125
+    )
+    red_rubber = Material(
+        "red_rubber", 1.0, Vector(0.9, 0.1, 0.0, 0.0), Vector(0.3, 0.1, 0.1), 10
+    )
+    mirror = Material(
+        "mirror", 1.0, Vector(0.0, 10.0, 0.8, 0.0), Vector(1.0, 1.0, 1.0), 1425
+    )
 
-    # print(scene)
-    # print(scene)
-    # render(scene)
+    spheres = [
+        Sphere(Vector(-3, 0, -16), 2, ivory),
+        Sphere(Vector(-1.0, -1.5, -12), 2, glass),
+        Sphere(Vector(1.5, -0.5, -18), 3, red_rubber),
+        Sphere(
+            Vector(
+                7,
+                5,
+                -18,
+            ),
+            4,
+            mirror,
+        ),
+    ]
+
+    lights = [
+        Light(Vector(-20, 20, 20), 1.5),
+        Light(Vector(30, 50, -25), 1.8),
+        Light(Vector(30, 20, 30), 1.7),
+    ]
+    scene = Scene(lights=lights, spheres=spheres)
+    print(scene)
+    render(scene)
 
 
 if __name__ == "__main__":

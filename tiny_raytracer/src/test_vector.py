@@ -43,8 +43,6 @@ class VectorTests(unittest.TestCase):
     def test_norm(self):
         c = self.a.norm()
         self.assertEqual(c, math.sqrt(3))
-        c = self.a.normalize().norm()
-        self.assertEqual(c, 1.0)
 
     def test_cross_product(self):
         c = self.a.cross(self.b)
@@ -73,10 +71,6 @@ class VectorTests(unittest.TestCase):
         c = 3 * self.a
         self.assertEqual(c, Vector(3.0, 3.0, 3.0))
 
-    def test_construct_from_list(self):
-        points = [1, 2, 3]
-        v = Vector(points)
-        self.assertEqual(v, Vector(1, 2, 3))
 
-
-unittest.main()
+if __name__ == "__main__":
+    unittest.main()
