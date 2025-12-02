@@ -90,10 +90,10 @@ def scene_intersect(origin, direction, spheres):
 
 def cast_ray(origin, direction, spheres, lights, depth=0):
     if depth > 4:
-        return Vector(0.2, 0.7, 0.8)
+        return Vector(0.2, 0.7, 0.1)
     has_hit, point, normal, material = scene_intersect(origin, direction, spheres)
     if not has_hit:
-        return Vector(0.2, 0.7, 0.8)
+        return Vector(0.2, 0.7, 0.1)
 
     reflect_dir = reflect(direction, normal).normalize()
     refract_dir = refract(direction, normal, material.refractive_index).normalize()
@@ -126,8 +126,8 @@ def cast_ray(origin, direction, spheres, lights, depth=0):
 
 
 def render(scene):
-    width = 400
-    height = 200
+    width = 800
+    height = 400
     # Change the width and height if you want a larger
     # or smaller image.
     fov = math.pi / 3.0
@@ -213,7 +213,7 @@ def main():
         "glass", 1.5, Vector(0.0, 0.5, 0.1, 0.8), Vector(0.6, 0.7, 0.8), 125
     )
     red_rubber = Material(
-        "red_rubber", 1.0, Vector(0.9, 0.1, 0.0, 0.0), Vector(0.3, 0.1, 0.1), 10
+        "red_rubber", 1.0, Vector(0.1, 0.4, 0.3, 0.0), Vector(0.3, 0.1, 0.1), 10
     )
     mirror = Material(
         "mirror", 1.0, Vector(0.0, 10.0, 0.8, 0.0), Vector(1.0, 1.0, 1.0), 1425
